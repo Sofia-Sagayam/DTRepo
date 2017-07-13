@@ -9,9 +9,15 @@ public class QueryParser {
 	private boolean hasAggregate;
 	private String path;
 	private List<Conditions> condition=new ArrayList();
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
+	}
 	private String grp_clause;
 	private String ord_clause;
-	
+	private int type;
 	
 		
 	public boolean isHasAggregate() {
@@ -60,62 +66,81 @@ public class QueryParser {
 		
 		}
 	}
-	public QueryParser validateAndFindType(String query){
-		String checker;
+	public QueryParser validateThruRegex(String query){
+		String queryHolder=query.toLowerCase();
+		String splitQuery[];
 		Conditions conditionObj=new Conditions();
-		/*Pattern pat1=Pattern.compile("select\\s.*from\\s.*");
-		Matcher mat1=pat1.matcher(query);
-		Pattern pat2=Pattern.compile("select\\s.*from\\s.*where\\s.");
-		Matcher mat2=pat2.matcher(query);
-		Pattern pat3=Pattern.compile("select\\s.*from\\s.*where\\s.*groupby\\s.*");
-		Matcher mat3=pat3.matcher(query);
-		Pattern pat4=Pattern.compile("select\\s.*from\\s.*where\\s.*groupby\\s.*orderby\\s.*");
-		Matcher mat4=pat4.matcher(query);
-		if(mat1.find() || mat2.find()||mat3.find()||mat4.find() )
-		{*/
-			String splitedQuery[]=query.split(" ");
-			for(int s=0;s<splitedQuery.length;s++){
-			switch (splitedQuery[s])
+		Pattern pat1=Pattern.compile("select\\s.*from\\s.*");
+		Matcher mat1=pat1.matcher(queryHolder);
+		if(mat1.find()){
+			if(queryHolder.contains("groupby"))
 			{
-			case "select":
-				checker=splitedQuery[s+1];
-				if(!checker.equals("*")){
-					String splitedColname[]=checker.split(",");
-					for(int c=0;c<splitedColname.length;c++){
-						cols.add(splitedColname[c]);
-					}
-					checkaggregate();
-					}
-				else{
-					
-				}
-				break;
-			case "from":
-				path=splitedQuery[s+1];
-				break;				
-			case "where":
-				checker=splitedQuery[s+1];
-				String conditionsplit[]=checker.split("_");
+				type=4;
+				splitQuery=queryHolder.split("groupby");
+				grp_clause=splitQuery[1].replaceAll("\\s","");
+				queryHolder=splitQuery[0];
 				
-				conditionObj.setCol_name(conditionsplit[0]);
-				conditionObj.setOperator(conditionsplit[1]);
-				conditionObj.setValue(conditionsplit[2]);
+				
+			}
+			if(queryHolder.contains("orderby")){
+				type=3;
+				splitQuery=queryHolder.split("orderby");
+				ord_clause=splitQuery[1].replaceAll("\\s","");
+				queryHolder=splitQuery[0];
+				
+			}
+			if(queryHolder.contains("where")){
+				type=2;
+				String wholeWhere="";
+				splitQuery=queryHolder.split("where");
+				wholeWhere=splitQuery[1].replaceAll("\\s","");
+				//if(wholeWhere.contains("AND"))
+				String conditionsplit[]=wholeWhere.split("[\\s]*[>=|<=|!=|=|<|>][\\s]*");
+				int l=conditionsplit.length;
+				if(l==3){
+					conditionObj.setCol_name(conditionsplit[0]);
+					conditionObj.setValue(conditionsplit[2]);
+					if(wholeWhere.contains(">="))conditionObj.setOperator(">=");
+					if(wholeWhere.contains("<="))conditionObj.setOperator("<=");
+					if(wholeWhere.contains("!="))conditionObj.setOperator("!=");
+									}
+				else if(l==2){
+					conditionObj.setCol_name(conditionsplit[0]);
+					conditionObj.setValue(conditionsplit[1]);
+					if(wholeWhere.contains(">"))conditionObj.setOperator(">");
+					if(wholeWhere.contains("<"))conditionObj.setOperator("<");
+					if(wholeWhere.contains("!"))conditionObj.setOperator("!");
+				}
 				condition.add(conditionObj);
-				break;				
-			case "groupby":
-				grp_clause=splitedQuery[s+1];
-				break;
-			case "orderby":
-				ord_clause=splitedQuery[s+1];
-				break;
+			
+					queryHolder=splitQuery[0];
 			}
+			if(queryHolder.contains("from")){
+				type=1;
+				splitQuery=queryHolder.split("from");
+				path="F:\\DT-3\\"+splitQuery[1].replaceAll("\\s","");
+				queryHolder=splitQuery[0];
 			}
-			return this;
-		/*}
-		else{
-			return "no";
-		}*/
-	
+			if(queryHolder.contains("select")){
+				splitQuery=queryHolder.split("select");
+			String columns=splitQuery[1].replaceAll("\\s","");
+			if(!columns.equals("*")){
+				String splitedColname[]=columns.trim().split(",");
+				for(int c=0;c<splitedColname.length;c++){
+					cols.add(splitedColname[c]);
+				}
+				
+				checkaggregate();
+				}
+			else{
+				cols.add("*");
+			}
+			queryHolder=splitQuery[0];
+			}
+			
+		}
+		
+		return this;
 	}
 	
 	
