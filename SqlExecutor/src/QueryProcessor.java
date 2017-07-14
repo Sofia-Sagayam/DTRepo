@@ -35,25 +35,45 @@ public Map<Integer,String> whereQueryProcessor(QueryParser parser,Map<String,Int
 	Map<Integer,String> rowdata=new HashMap<>();
 	try{
 	BufferedReader reader=new BufferedReader(new FileReader(parser.getPath()));
+	String colname=parser.getCondition().get(0).getCol_name();
+	String valu=parser.getCondition().get(0).getValue();
+    int index=0,h=0;
+    int colcount=parser.getCols().size();
+    String str=reader.readLine();
+    str=reader.readLine();
+    if(parser.getCols().get(0).equals("*")){
+
+    	while(str!=null){
+
+		String aftersplit[]=str.split(",");
+			if(aftersplit[header.get(colname)].equals(valu)){
+											rowdata.put(index,str);
+				h++;
 	
-int index=0;
-int colcount=parser.getCols().size();
-String str=reader.readLine();
-str=reader.readLine();
+				
+			}index++;
+			str=reader.readLine();	
+	}
+return rowdata;
+    }
+else
+{
 while(str!=null){
 	String aftersplit[]=str.split(",");
-	String colname=parser.getCondition().get(0).getCol_name();
-		if(Integer.parseInt(aftersplit[header.get(colname)])==20000){
+	
+		//if(Integer.parseInt(aftersplit[header.get(colname)])==20000){
+	if(aftersplit[header.get(colname)].equals(valu)){
 			StringBuffer sb=new StringBuffer();
-	for(int h=0;h<colcount;h++){
+	for( h=0;h<colcount;h++){
 		sb.append(aftersplit[header.get(parser.getCols().get(h))]+",");
 	rowdata.put(index,sb.toString());
 	}
-		}
-	
+	}
+	index++;
 	str=reader.readLine();	
 }
 			}
+}
 
 	catch(IOException io){
 		

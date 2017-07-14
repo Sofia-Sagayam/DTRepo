@@ -16,18 +16,34 @@ public class InputQueryTest {
 	/*
 	@Test
 	public void testAllCol(){
-		Map<Integer,String> resultset=csv.collectQuery("select * from myfile.csv ");
+		Map<Integer,String> resultset=csv.executeQuery("select * from myfile.csv ");
 		display(resultset);
 		assertEquals(5,resultset.size());
 		}
 	*/
-	@Test
+	/*@Test
 	public void testSpecifiedCol(){
-		Map<Integer,String> resultset=csv.collectQuery("select eid,esal,edept,ename from myfile.csv where esal=100");
-		display(resultset);
-		assertEquals(5,resultset.size());
+		Map<Integer,String> resultSet=csv.executeQuery("select eid,esal,edept,ename from myfile.csv");
+		display(resultSet);
+		assertEquals(1,resultSet.size());
+		}*/
+	@Test
+	public void testAllColWhere(){
+		Map<Integer,String> resultSet=csv.executeQuery("select * from myfile.csv where ename=ravan");
+		display(resultSet);
+		assertEquals(1,resultSet.size());
 		}
-		
+
+	
+	
+	/*@Test
+	public void testSpecColWhere(){
+		Map<Integer,String> resultSet=csv.executeQuery("select eid,esal,edept,ename from myfile.csv where edept=travel");
+		display(resultSet);
+		assertEquals(1,resultSet.size());
+		}
+	
+		*/
 		public void display(Map<Integer,String> map){
 			for(String s:map.values()){
 				System.out.println(s);

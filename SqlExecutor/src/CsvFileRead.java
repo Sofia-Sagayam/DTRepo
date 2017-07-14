@@ -11,7 +11,7 @@ public class CsvFileRead {
 	QueryParser queryParse=new QueryParser();
 	QueryProcessor processor=new QueryProcessor();
 	BufferedReader reader;
-	public Map<Integer,String> collectQuery(String query){
+	public Map<Integer,String> executeQuery(String query){
 		QueryParser parsedQuery=queryParse.validateThruRegex(query);
 		//storeHeaderOfCsv(parsedQuery.getPath());//header from csv
 		//getDataFromCsv(parsedQuery);//content from csv
@@ -21,7 +21,7 @@ public class CsvFileRead {
 				}
 		if(parsedQuery.getType1()==1){
 			if(parsedQuery.getCols().get(0).equals("*"))
-		return getDataFromCsv(parsedQuery);	
+				return getDataFromCsv(parsedQuery);	
 			else
 				return processor.specifiedQueryProcessor(parsedQuery,storeHeaderOfCsv(parsedQuery.getPath()));
 		}
