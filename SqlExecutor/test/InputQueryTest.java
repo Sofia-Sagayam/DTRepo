@@ -23,7 +23,7 @@ public class InputQueryTest {
 	*/
 	@Test
 	public void testSpecifiedCol(){
-		Map<Integer,String> resultset=csv.collectQuery("select eid,esal from myfile.csv");
+		Map<Integer,String> resultset=csv.collectQuery("select eid,esal,edept,ename from myfile.csv where esal=100");
 		display(resultset);
 		assertEquals(5,resultset.size());
 		}
