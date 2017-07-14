@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
 public class CsvFileRead {
 	QueryParser queryParse=new QueryParser();
 	QueryProcessor processor=new QueryProcessor();
@@ -12,9 +15,18 @@ public class CsvFileRead {
 		QueryParser parsedQuery=queryParse.validateThruRegex(query);
 		//storeHeaderOfCsv(parsedQuery.getPath());//header from csv
 		//getDataFromCsv(parsedQuery);//content from csv
-		if(parsedQuery.getType()==1){
-		return processor.simpleQueryProcessor(parsedQuery.getCols(), getDataFromCsv(parsedQuery), storeHeaderOfCsv(parsedQuery.getPath()));	
+		if(parsedQuery.getType2()==2){
+			processor.whereQueryProcessor(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
+		
+		return null;
 		}
+		if(parsedQuery.getType1()==1){
+			if(parsedQuery.getCols().get(0).equals("*"))
+		return getDataFromCsv(parsedQuery);	
+			else
+				return processor.specifiedQueryProcessor(parsedQuery,storeHeaderOfCsv(parsedQuery.getPath()));
+		}
+		
 		return null;
 }
 	public Map<String,Integer> storeHeaderOfCsv(String csvpath)
@@ -56,7 +68,5 @@ while(str!=null){
 		}
 	return rowdata;
 	}
-	public void simpleQuery(){
-		
-	}
+	
 }

@@ -13,11 +13,19 @@ public class InputQueryTest {
 		 parser=new QueryParser();
 		 csv=new CsvFileRead();
 	}
-	
+	/*
 	@Test
-	public void testPath(){
-		display(csv.collectQuery("select * from myfile.csv "));
-		
+	public void testAllCol(){
+		Map<Integer,String> resultset=csv.collectQuery("select * from myfile.csv ");
+		display(resultset);
+		assertEquals(5,resultset.size());
+		}
+	*/
+	@Test
+	public void testSpecifiedCol(){
+		Map<Integer,String> resultset=csv.collectQuery("select eid,esal from myfile.csv");
+		display(resultset);
+		assertEquals(5,resultset.size());
 		}
 		
 		public void display(Map<Integer,String> map){

@@ -9,17 +9,36 @@ public class QueryParser {
 	private boolean hasAggregate;
 	private String path;
 	private List<Conditions> condition=new ArrayList();
-	public int getType() {
-		return type;
-	}
-	public void setType(int type) {
-		this.type = type;
-	}
+	
 	private String grp_clause;
 	private String ord_clause;
-	private int type;
+	private  int type1,type2,type3,type4;
 	
 		
+	public int getType1() {
+		return type1;
+	}
+	public void setType1(int type1) {
+		this.type1 = type1;
+	}
+	public int getType2() {
+		return type2;
+	}
+	public void setType2(int type2) {
+		this.type2 = type2;
+	}
+	public int getType3() {
+		return type3;
+	}
+	public void setType3(int type3) {
+		this.type3 = type3;
+	}
+	public int getType4() {
+		return type4;
+	}
+	public void setType4(int type4) {
+		this.type4 = type4;
+	}
 	public boolean isHasAggregate() {
 		return hasAggregate;
 	}
@@ -75,7 +94,7 @@ public class QueryParser {
 		if(mat1.find()){
 			if(queryHolder.contains("groupby"))
 			{
-				type=4;
+				type4=4;
 				splitQuery=queryHolder.split("groupby");
 				grp_clause=splitQuery[1].replaceAll("\\s","");
 				queryHolder=splitQuery[0];
@@ -83,20 +102,22 @@ public class QueryParser {
 				
 			}
 			if(queryHolder.contains("orderby")){
-				type=3;
+				type3=3;
 				splitQuery=queryHolder.split("orderby");
 				ord_clause=splitQuery[1].replaceAll("\\s","");
 				queryHolder=splitQuery[0];
 				
 			}
 			if(queryHolder.contains("where")){
-				type=2;
+				type2=2;
 				String wholeWhere="";
 				splitQuery=queryHolder.split("where");
 				wholeWhere=splitQuery[1].replaceAll("\\s","");
+				//System.out.println(wholeWhere);
 				//if(wholeWhere.contains("AND"))
 				String conditionsplit[]=wholeWhere.split("[\\s]*[>=|<=|!=|=|<|>][\\s]*");
 				int l=conditionsplit.length;
+				//System.out.println(l);
 				if(l==3){
 					conditionObj.setCol_name(conditionsplit[0]);
 					conditionObj.setValue(conditionsplit[2]);
@@ -109,14 +130,14 @@ public class QueryParser {
 					conditionObj.setValue(conditionsplit[1]);
 					if(wholeWhere.contains(">"))conditionObj.setOperator(">");
 					if(wholeWhere.contains("<"))conditionObj.setOperator("<");
-					if(wholeWhere.contains("!"))conditionObj.setOperator("!");
+					if(wholeWhere.contains("="))conditionObj.setOperator("=");
 				}
 				condition.add(conditionObj);
 			
 					queryHolder=splitQuery[0];
 			}
 			if(queryHolder.contains("from")){
-				type=1;
+				type1=1;
 				splitQuery=queryHolder.split("from");
 				path="F:\\DT-3\\"+splitQuery[1].replaceAll("\\s","");
 				queryHolder=splitQuery[0];
