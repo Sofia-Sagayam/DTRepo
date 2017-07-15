@@ -20,14 +20,14 @@ public class InputQueryTest {
 		display(resultset);
 		assertEquals(5,resultset.size());
 		}
-	*/
-	/*@Test
+	
+	@Test
 	public void testSpecifiedCol(){
 		Map<Integer,String> resultSet=csv.executeQuery("select eid,esal,edept,ename from myfile.csv");
 		display(resultSet);
 		assertEquals(1,resultSet.size());
-		}*/
-	@Test
+		}
+	/*@Test
 	public void testAllColWhere(){
 		Map<Integer,String> resultSet=csv.executeQuery("select * from myfile.csv where ename=ravan");
 		display(resultSet);
@@ -36,21 +36,38 @@ public class InputQueryTest {
 
 	
 	
-	/*@Test
+	@Test
 	public void testSpecColWhere(){
 		Map<Integer,String> resultSet=csv.executeQuery("select eid,esal,edept,ename from myfile.csv where edept=travel");
 		display(resultSet);
 		assertEquals(1,resultSet.size());
 		}
-	
-		*/
+	*/
+	/*
+	@Test
+	public void testMultiWhere(){
+		Map<Integer,String> resultSet=csv.executeQuery("select * from myfile.csv where edept=travel or esal>20000 OR esal==23 or");
+		displayMultiWhr(parser);
+		assertEquals(1,resultSet.size());
+		}*/
 		public void display(Map<Integer,String> map){
 			for(String s:map.values()){
 				System.out.println(s);
 		}
+			
+		}/*
+			public void displayMultiWhr(QueryParser parser){
+					System.out.println(parser);
+			
+				
+	}*/
+	
+	@Test
+	public void multiWhereAllOper(){
+		Map<Integer,String> resultSet=csv.executeQuery("select ename,edept from myfile.csv where eid <104");
+		display(resultSet);
+		assertEquals(1,resultSet.size());
 	}
-	
-	
 	/*
 	@Test
 		public void testPath(){

@@ -8,7 +8,7 @@ public class QueryParser {
 	private List<String> cols=new ArrayList<>();
 	private boolean hasAggregate;
 	private String path;
-	private List<Conditions> condition=new ArrayList();
+	private List<Conditions> condition=new ArrayList<>();
 	
 	private String grp_clause;
 	private String ord_clause;
@@ -88,7 +88,7 @@ public class QueryParser {
 	public QueryParser validateThruRegex(String query){
 		String queryHolder=query.toLowerCase();
 		String splitQuery[];
-		Conditions conditionObj=new Conditions();
+		
 		Pattern pat1=Pattern.compile("select\\s.*from\\s.*");
 		Matcher mat1=pat1.matcher(queryHolder);
 		if(mat1.find()){
@@ -112,30 +112,74 @@ public class QueryParser {
 				type2=2;
 				String wholeWhere="";
 				splitQuery=queryHolder.split("where");
-				wholeWhere=splitQuery[1].replaceAll("\\s","");
-				//System.out.println(wholeWhere);
-				//if(wholeWhere.contains("AND"))
-				String conditionsplit[]=wholeWhere.split("[\\s]*[>=|<=|!=|=|<|>][\\s]*");
+				wholeWhere=splitQuery[1];
+								
+				List<String> operands=new ArrayList<>();
+				List<String> operators=new ArrayList<>();
+				String holder=wholeWhere;
+				StringBuilder sb=new StringBuilder();
+			    for(String s: holder.split(" ")){
+
+			        if(!s.equals(""))        // ignore space
+			         sb.append(s+" ");       // add word with 1 space
+
+			    }
+			   holder= sb.toString();
+			   sb.setLength(0);
+			String splitHolder[]= holder.split(" ");
+			int si=splitHolder.length;
+			String splitNew[]=new String[si+1];
+			for(int s=0;s<si;s++){
+			splitNew[s]=splitHolder[s];	
+			}
+			splitNew[si]="dummy";
+			
+			for(String st:splitNew){
+			if(!st.equals("and") && !st.equals("or")&& !st.equals("dummy") ){
+					sb.append(st);}
+			else if(st.equals("and")){
+				operators.add("and");
+				operands.add(sb.toString());
+				sb.setLength(0);
+				}
+			else if(st.equals("or")){
+				operators.add("or");
+				operands.add(sb.toString());
+				sb.setLength(0);
+			}
+			else if(st.equals("dummy")){
+				operands.add(sb.toString());
+				sb.setLength(0);
+			}
+				
+			}
+			
+			int len=operands.size();
+			Conditions conditionObj[]=new Conditions[len];
+				for(int assign=0;assign<len;assign++){
+					conditionObj[assign]=new Conditions();
+				String conditionsplit[]=operands.get(assign).split("[\\s]*[>=|<=|!=|=|<|>][\\s]*");
 				int l=conditionsplit.length;
-				//System.out.println(l);
+				
 				if(l==3){
-					conditionObj.setCol_name(conditionsplit[0]);
-					conditionObj.setValue(conditionsplit[2]);
-					if(wholeWhere.contains(">="))conditionObj.setOperator(">=");
-					if(wholeWhere.contains("<="))conditionObj.setOperator("<=");
-					if(wholeWhere.contains("!="))conditionObj.setOperator("!=");
+					conditionObj[assign].setCol_name(conditionsplit[0]);
+					conditionObj[assign].setValue(conditionsplit[2]);
+					if(operands.get(assign).contains(">="))conditionObj[assign].setOperator(">=");
+					if(operands.get(assign).contains("<="))conditionObj[assign].setOperator("<=");
+					if(operands.get(assign).contains("!="))conditionObj[assign].setOperator("!=");
 									}
 				else if(l==2){
-					conditionObj.setCol_name(conditionsplit[0]);
-					conditionObj.setValue(conditionsplit[1]);
-					if(wholeWhere.contains(">"))conditionObj.setOperator(">");
-					if(wholeWhere.contains("<"))conditionObj.setOperator("<");
-					if(wholeWhere.contains("="))conditionObj.setOperator("=");
+					conditionObj[assign].setCol_name(conditionsplit[0]);
+					conditionObj[assign].setValue(conditionsplit[1]);
+					if(operands.get(assign).contains(">"))conditionObj[assign].setOperator(">");
+					if(operands.get(assign).contains("<"))conditionObj[assign].setOperator("<");
+					if(operands.get(assign).contains("="))conditionObj[assign].setOperator("=");
 				}
-				condition.add(conditionObj);
+				condition.add(conditionObj[assign]);
 			
-					queryHolder=splitQuery[0];
+					
 			}
+				queryHolder=splitQuery[0];}
 			if(queryHolder.contains("from")){
 				type1=1;
 				splitQuery=queryHolder.split("from");

@@ -16,7 +16,7 @@ public class CsvFileRead {
 		//storeHeaderOfCsv(parsedQuery.getPath());//header from csv
 		//getDataFromCsv(parsedQuery);//content from csv
 		if(parsedQuery.getType2()==2){
-			return processor.whereQueryProcessor(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
+				return processor.whereQueryProcessor(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
 		
 				}
 		if(parsedQuery.getType1()==1){

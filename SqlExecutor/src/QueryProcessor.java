@@ -18,7 +18,8 @@ while(str!=null){
 	StringBuffer sb=new StringBuffer();
 	for(int h=0;h<colcount;h++){
 		sb.append(aftersplit[header.get(parser.getCols().get(h))]+",");
-	rowdata.put(index,sb.toString());
+		String st=sb.toString();
+	rowdata.put(index,st.substring(0, st.length()-1));
 	}
 	index++;
 	str=reader.readLine();
@@ -44,7 +45,7 @@ public Map<Integer,String> whereQueryProcessor(QueryParser parser,Map<String,Int
     if(parser.getCols().get(0).equals("*")){
 
     	while(str!=null){
-
+if(parser.getCondition().get(0).getOperator().equals("=")){
 		String aftersplit[]=str.split(",");
 			if(aftersplit[header.get(colname)].equals(valu)){
 											rowdata.put(index,str);
@@ -53,7 +54,8 @@ public Map<Integer,String> whereQueryProcessor(QueryParser parser,Map<String,Int
 				
 			}index++;
 			str=reader.readLine();	
-	}
+	}}
+    	
 return rowdata;
     }
 else
@@ -61,16 +63,66 @@ else
 while(str!=null){
 	String aftersplit[]=str.split(",");
 	
-		//if(Integer.parseInt(aftersplit[header.get(colname)])==20000){
+	if(parser.getCondition().get(0).getOperator().equals("=")){
 	if(aftersplit[header.get(colname)].equals(valu)){
 			StringBuffer sb=new StringBuffer();
 	for( h=0;h<colcount;h++){
 		sb.append(aftersplit[header.get(parser.getCols().get(h))]+",");
-	rowdata.put(index,sb.toString());
+		String st=sb.toString();
+	rowdata.put(index,st.substring(0, st.length()-1));
 	}
 	}
 	index++;
-	str=reader.readLine();	
+	str=reader.readLine();	}
+	else if(parser.getCondition().get(0).getOperator().equals(">")){
+		long res=Math.max(Long.parseLong(aftersplit[header.get(colname)]),Long.parseLong(valu));
+				if(Long.toString(res).equals(aftersplit[header.get(colname)])&& !Long.toString(res).equals(valu)){
+							StringBuffer sb=new StringBuffer();
+		for( h=0;h<colcount;h++){
+			sb.append(aftersplit[header.get(parser.getCols().get(h))]+",");
+			String st=sb.toString();
+		rowdata.put(index,st.substring(0, st.length()-1));
+		}
+		}
+		index++;
+		str=reader.readLine();	}
+	else if(parser.getCondition().get(0).getOperator().equals(">=")){
+		long res=Math.max(Long.parseLong(aftersplit[header.get(colname)]),Long.parseLong(valu));
+				if(Long.toString(res).equals(aftersplit[header.get(colname)])){
+							StringBuffer sb=new StringBuffer();
+		for( h=0;h<colcount;h++){
+			sb.append(aftersplit[header.get(parser.getCols().get(h))]+",");
+			String st=sb.toString();
+		rowdata.put(index,st.substring(0, st.length()-1));
+		}
+		}
+		index++;
+		str=reader.readLine();	}
+	else if(parser.getCondition().get(0).getOperator().equals("<")){
+		long res=Math.min(Long.parseLong(aftersplit[header.get(colname)]),Long.parseLong(valu));
+				if(Long.toString(res).equals(aftersplit[header.get(colname)])&& !Long.toString(res).equals(valu)){
+							StringBuffer sb=new StringBuffer();
+		for( h=0;h<colcount;h++){
+			sb.append(aftersplit[header.get(parser.getCols().get(h))]+",");
+			String st=sb.toString();
+		rowdata.put(index,st.substring(0, st.length()-1));
+		}
+		}
+		index++;
+		str=reader.readLine();	}
+	else if(parser.getCondition().get(0).getOperator().equals("<=")){
+		long res=Math.min(Long.parseLong(aftersplit[header.get(colname)]),Long.parseLong(valu));
+				if(Long.toString(res).equals(aftersplit[header.get(colname)])){
+							StringBuffer sb=new StringBuffer();
+		for( h=0;h<colcount;h++){
+			sb.append(aftersplit[header.get(parser.getCols().get(h))]+",");
+			String st=sb.toString();
+		rowdata.put(index,st.substring(0, st.length()-1));
+		}
+		}
+		index++;
+		str=reader.readLine();	}
+	
 }
 			}
 }
