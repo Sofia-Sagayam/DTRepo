@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class QueryProcessor {
 
@@ -335,17 +339,16 @@ public class QueryProcessor {
 
 						}
 					}
-					boolean res=mulRes[0];
+					boolean res = mulRes[0];
 					for (int god = 0; god < logiOperLen - 1; god++) {
-						
-						if(parser.getOperators().get(god).equals("and")){
-							res=res && mulRes[god+1];
+
+						if (parser.getOperators().get(god).equals("and")) {
+							res = res && mulRes[god + 1];
+						} else if (parser.getOperators().get(god).equals("or")) {
+							res = res || mulRes[god + 1];
 						}
-						else if(parser.getOperators().get(god).equals("or")){
-							res=res || mulRes[god+1];
-						}
-					} 
-					if(res){
+					}
+					if (res) {
 						StringBuffer sb = new StringBuffer();
 						for (h = 0; h < colcount; h++) {
 							sb.append(aftersplit[header.get(parser.getCols().get(h))] + ",");
@@ -353,17 +356,15 @@ public class QueryProcessor {
 							rowdata.put(index, st.substring(0, st.length() - 1));
 						}
 					}
-							index++;
-							str = reader.readLine();		
+					index++;
+					str = reader.readLine();
 				}
 
-					}
+			}
 
-					
-				}
+		}
 
-			
-		 catch (IOException e) {
+		catch (IOException e) {
 		}
 		return rowdata;
 	}
@@ -670,7 +671,91 @@ public class QueryProcessor {
 		return null;
 	}
 
-	public void multipleWhere() {
+	public Map<Integer,String> groupByQueryProcessor(QueryParser parser, Map<String, Integer> header) {
+		Set<String> uniqueValue = new LinkedHashSet<>();
+		List<String> csvData=new ArrayList<>();
+		Map<Integer,String> rowdata=new HashMap<>();
+		Map<Integer,String> resSet=new HashMap<>();
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(parser.getPath()));
+			String str = reader.readLine();
+			str = reader.readLine();
+			while (str != null) {
+				String afterSplit[] = str.split(",");
+				uniqueValue.add(afterSplit[header.get(parser.getGrp_clause())]);
+				csvData.add(str);
+				str = reader.readLine();
+			}
+			boolean res=false;
+			for(int i=0;i<parser.getCols().size();i++){
+				res=parser.getCols().get(i).contains("count");
+			}
+			if(res){
+			int index=0;
+			for(String uniq:uniqueValue){
+				StringBuffer sb=new StringBuffer();
+				for(String csv:csvData){
+					if(csv.contains(uniq)){
+					sb.append(csv+",");
+					}
+					
+				}
+				rowdata.put(index, sb.toString());
+				index++;
+			}
+			int count=0;
+			index=0;
+			
+			for(String ite:rowdata.values()){
+				String splitVal[]=ite.split(",");
+				count=splitVal.length;
+				
+			resSet.put(index, Integer.toString(count/header.size()));
+			index++;
+			}
+			}
+			else {
+				String aggr=" ";
+				res=false;
+				int i=0;
+				for( i=0;i<parser.getCols().size();i++){
+					if(parser.getCols().get(i).contains("sum")){
+						aggr = parser.getCols().get(i).split("sum")[1];
+						aggr = aggr.replaceAll("\\p{P}", "");
+					}
+				}
+				int headerposi=header.get(aggr);
+				int salsum=0,index=0;
+				for(String uni:uniqueValue){
+				for(String csv:csvData){					
+					String split[]=csv.split(",");
+					if(csv.contains(uni)){
+					salsum+=Integer.parseInt(split[headerposi]);}
+					}
+					resSet.put(index, Integer.toString(salsum));
+					index++;
+					salsum=0;
+				}
+				}
+			Iterator<String>iter=uniqueValue.iterator();
+			int l=uniqueValue.size();
+			StringBuilder sb=new StringBuilder();
+			for(int data=0;data<l;data++){
+				sb.append(iter.next()+" "+resSet.get(data));
+				rowdata.put(data, sb.toString());
+				sb.setLength(0);
+			}
+		
+			
 
+		}
+				
+		catch (IOException io) {
+		}
+		
+		
+		return rowdata;
+		
 	}
 }

@@ -25,6 +25,7 @@ public class QueryParser implements Cloneable{
 	public void setHasAggregate(boolean hasAggregate) {
 		this.hasAggregate = hasAggregate;
 	}
+
 	public List<String> getOperators() {
 		return operators;
 	}
