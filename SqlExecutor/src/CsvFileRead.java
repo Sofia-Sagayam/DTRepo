@@ -12,22 +12,45 @@ public class CsvFileRead {
 	QueryProcessor processor=new QueryProcessor();
 	BufferedReader reader;
 	public Map<Integer,String> executeQuery(String query){
+		
 		QueryParser parsedQuery=queryParse.validateThruRegex(query);
 		//storeHeaderOfCsv(parsedQuery.getPath());//header from csv
 		//getDataFromCsv(parsedQuery);//content from csv
+		if(parsedQuery.getType3()==3){
+			if(parsedQuery.getType2()==2){
+										return processor.orderByWhereQueryProcessor(parsedQuery,storeHeaderOfCsv(parsedQuery.getPath()));
+			}else{
+			if(parsedQuery.getCondition().size()==1){
+				return processor.getOrderByDataForAllRows(parsedQuery,storeHeaderOfCsv(parsedQuery.getPath()));}
+			else{
+				return processor.getOrderByForSpecifiedCols(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
+			}
+		}}
 		if(parsedQuery.getType2()==2){
+			if(parsedQuery.getCondition().get(0).equals("*"))
 				return processor.whereQueryProcessor(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
-		
+			
+			else if(parsedQuery.isHasAggregate()){
+								return processor.aggregateWithWhere(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
+			}
+			else{
+								return processor.multiWhereProcessor(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));}
 				}
 		if(parsedQuery.getType1()==1){
 			if(parsedQuery.getCols().get(0).equals("*"))
 				return getDataFromCsv(parsedQuery);	
-			else
+			else if(parsedQuery.isHasAggregate()){
+			return processor.aggregateQuery(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
+			}
+			else {
 				return processor.specifiedQueryProcessor(parsedQuery,storeHeaderOfCsv(parsedQuery.getPath()));
 		}
+			
+			}
 		
 		return null;
 }
+
 	public Map<String,Integer> storeHeaderOfCsv(String csvpath)
 	{
 		Map<String,Integer> headerInMap=new HashMap<>();

@@ -3,18 +3,34 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class QueryParser {
+public class QueryParser implements Cloneable{
 	
 	private List<String> cols=new ArrayList<>();
-	private boolean hasAggregate;
 	private String path;
+	private boolean hasAggregate;
 	private List<Conditions> condition=new ArrayList<>();
-	
+	private List<String> operators=new ArrayList<>();
 	private String grp_clause;
 	private String ord_clause;
 	private  int type1,type2,type3,type4;
 	
-		
+	public Object clone()throws CloneNotSupportedException{
+		return super.clone();
+		}
+
+
+	public boolean isHasAggregate() {
+		return hasAggregate;
+	}
+	public void setHasAggregate(boolean hasAggregate) {
+		this.hasAggregate = hasAggregate;
+	}
+	public List<String> getOperators() {
+		return operators;
+	}
+	public void setOperators(List<String> operators) {
+		this.operators = operators;
+	}
 	public int getType1() {
 		return type1;
 	}
@@ -39,13 +55,8 @@ public class QueryParser {
 	public void setType4(int type4) {
 		this.type4 = type4;
 	}
-	public boolean isHasAggregate() {
-		return hasAggregate;
-	}
-	public void setHasAggregate(boolean hasAggregate) {
-		this.hasAggregate = hasAggregate;
-	}
-	public List<String> getCols() {
+	
+		public List<String> getCols() {
 		return cols;
 	}
 	public void setCols(List<String> cols) {
@@ -77,16 +88,18 @@ public class QueryParser {
 		this.ord_clause = ord_clause;
 	}
 	public void checkaggregate(){
+		
 		for(String col:cols){
-			if(col.contains("sum")||col.contains("count")){
-				setHasAggregate(true);
+			if(col.contains("sum")||col.contains("count")||col.contains("avg")||col.contains("min")||col.contains("max")){
+				hasAggregate=true;
 			}
-			else setHasAggregate(false);
+			else
+				hasAggregate=false;
 		
 		}
 	}
 	public QueryParser validateThruRegex(String query){
-		String queryHolder=query.toLowerCase();
+		String queryHolder=query;
 		String splitQuery[];
 		
 		Pattern pat1=Pattern.compile("select\\s.*from\\s.*");
@@ -109,13 +122,13 @@ public class QueryParser {
 				
 			}
 			if(queryHolder.contains("where")){
+			List<String> operands=new ArrayList<>();
 				type2=2;
 				String wholeWhere="";
 				splitQuery=queryHolder.split("where");
 				wholeWhere=splitQuery[1];
 								
-				List<String> operands=new ArrayList<>();
-				List<String> operators=new ArrayList<>();
+				
 				String holder=wholeWhere;
 				StringBuilder sb=new StringBuilder();
 			    for(String s: holder.split(" ")){
@@ -155,7 +168,7 @@ public class QueryParser {
 			}
 			
 			int len=operands.size();
-			Conditions conditionObj[]=new Conditions[len];
+						Conditions conditionObj[]=new Conditions[len];
 				for(int assign=0;assign<len;assign++){
 					conditionObj[assign]=new Conditions();
 				String conditionsplit[]=operands.get(assign).split("[\\s]*[>=|<=|!=|=|<|>][\\s]*");

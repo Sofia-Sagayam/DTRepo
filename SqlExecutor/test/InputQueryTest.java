@@ -3,87 +3,156 @@ import static org.junit.Assert.*;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class InputQueryTest {
-	QueryParser parser;
 	CsvFileRead csv;
+
 	@Before
-	public void objectCreate(){
-		 parser=new QueryParser();
-		 csv=new CsvFileRead();
+	public void objectCreate() {
+				csv = new CsvFileRead();
 	}
-	/*
-	@Test
-	public void testAllCol(){
-		Map<Integer,String> resultset=csv.executeQuery("select * from myfile.csv ");
-		display(resultset);
-		assertEquals(5,resultset.size());
-		}
-	
-	@Test
-	public void testSpecifiedCol(){
-		Map<Integer,String> resultSet=csv.executeQuery("select eid,esal,edept,ename from myfile.csv");
-		display(resultSet);
-		assertEquals(1,resultSet.size());
-		}
 	/*@Test
-	public void testAllColWhere(){
-		Map<Integer,String> resultSet=csv.executeQuery("select * from myfile.csv where ename=ravan");
-		display(resultSet);
-		assertEquals(1,resultSet.size());
-		}
+	public void selectAllWithoutWhereTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select * from CsvDB.csv");
+		assertNotNull(dataSet);
+		display("selectAllWithoutWhereTestCase",dataSet);
+		
+	}
+	@Test
+	public void selectColumnsWithoutWhereTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,dept,name from CsvDB.csv");
+		assertNotNull(dataSet);
+		display("selectColumnsWithoutWhereTestCase",dataSet);
+		
+	}
 
 	
+	@Test
+	public void withWhereGreaterThanTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,name,salary from CsvDB.csv where salary>30000");
+		assertNotNull(dataSet);
+		display("withWhereGreaterThanTestCase",dataSet);
+		
+	}
+	@Test
+	public void withWhereLessThanTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,name,salary from CsvDB.csv where salary<35000");
+		assertNotNull(dataSet);
+		display("withWhereLessThanTestCase",dataSet);
+		
+	}
+	@Test
+	public void withWhereLessThanOrEqualToTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,name,salary from CsvDB.csv where salary<=35000");
+		assertNotNull(dataSet);
+		display("withWhereLessThanOrEqualToTestCase",dataSet);
+		
+	}
+	@Test
+	public void withWhereGreaterThanOrEqualToTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,name,salary from CsvDB.csv where salary>=35000");
+		assertNotNull(dataSet);
+		display("withWhereLessThanOrEqualToTestCase",dataSet);
+		
+	}
+
 	
 	@Test
-	public void testSpecColWhere(){
-		Map<Integer,String> resultSet=csv.executeQuery("select eid,esal,edept,ename from myfile.csv where edept=travel");
-		display(resultSet);
-		assertEquals(1,resultSet.size());
-		}
-	*/
-	/*
-	@Test
-	public void testMultiWhere(){
-		Map<Integer,String> resultSet=csv.executeQuery("select * from myfile.csv where edept=travel or esal>20000 OR esal==23 or");
-		displayMultiWhr(parser);
-		assertEquals(1,resultSet.size());
-		}*/
-		public void display(Map<Integer,String> map){
-			for(String s:map.values()){
-				System.out.println(s);
-		}
-			
-		}/*
-			public void displayMultiWhr(QueryParser parser){
-					System.out.println(parser);
-			
-				
-	}*/
-	
-	@Test
-	public void multiWhereAllOper(){
-		Map<Integer,String> resultSet=csv.executeQuery("select ename,edept from myfile.csv where ename=lakshman");
-		display(resultSet);
-		//assertEquals(1,resultSet.size());
-	}
-	/*
-	@Test
-		public void testPath(){
-		assertEquals("myfile.csv",qp2.getPath());
-	}
-	@Test
-	public void testCondtion(){
-		assertEquals("<",qp2.getCondition().get(0).getOperator());
-	}
-	@Test
-	public void testcolumns(){
-		assertEquals("[]",qp2.getCols().toString());
-	}
-	@Test
-	public void testClause(){
-		assertEquals("edept",qp2.getGrp_clause());
+	public void withWhereNotEqualToTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,name,salary from CsvDB.csv where salary!=35000");
+		assertNotNull(dataSet);
+		display("withWhereNotEqualToTestCase",dataSet);
+		
 	}
 */
-}
+
+	@Test
+	public void withWhereEqualAndNotEqualTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,name,salary from CsvDB.csv where city=Bangalore and salary<=40000");
+		assertNotNull(dataSet);
+		display("withWhereEqualAndNotEqualTestCase",dataSet);
+		
+	}
+	
+
+/*	@Test
+	public void selectColumnsWithoutWhereWithOrderByTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,name,salary from CsvDB.csv orderby name");
+		assertNotNull(dataSet);
+		display("selectColumnsWithoutWhereWithOrderByTestCase",dataSet);
+		
+	}
+	@Test
+	public void selectColumnsWithWhereWithOrderByTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select city,name,salary from CsvDB.csv where city=Bangalore orderby name");
+		assertNotNull(dataSet);
+		display("selectColumnsWithWhereWithOrderByTestCase",dataSet);
+		
+	}
+
+	@Test
+	public void selectCountColumnsWithoutWhereTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select count(name) from CsvDB.csv");
+		assertNotNull(dataSet);
+		display("selectCountColumnsWithoutWhereTestCase",dataSet);
+		
+	}
+
+	@Test
+	public void selectSumColumnsWithoutWhereTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select sum(salary) from CsvDB.csv");
+		assertNotNull(dataSet);
+		display("selectSumColumnsWithoutWhereTestCase",dataSet);
+	}
+	@Test
+	public void selectAvgColumnsWithoutWhereTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select avg(salary) from CsvDB.csv");
+		assertNotNull(dataSet);
+		display("selectAvgColumnsWithoutWhereTestCase",dataSet);
+	}
+	@Test
+	public void selectMinColumnsWithoutWhereTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select min(salary) from CsvDB.csv");
+		assertNotNull(dataSet);
+		display("selectMinColumnsWithoutWhereTestCase",dataSet);}
+	@Test
+public void selectMaxColumnsWithoutWhereTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select max(salary) from CsvDB.csv");
+		assertNotNull(dataSet);
+		display("selectMaxColumnsWithoutWhereTestCase",dataSet);}
+		
+	@Test
+	public void selectSumColumnsWithWhereTestCase(){
+		
+		Map<Integer,String> dataSet=csv.executeQuery("select sum(salary) from CsvDB.csv where city=Bangalore");
+		assertNotNull(dataSet);
+		display("selectSumColumnsWithWhereTestCase",dataSet);
+		
+	}
+*/
+
+	private void display(String testCaseName,Map<Integer,String> dataSet){
+		System.out.println(testCaseName);
+		System.out.println("================================================================");
+		for(String d:dataSet.values())
+		System.out.println(d);
+	}
+
+	}
