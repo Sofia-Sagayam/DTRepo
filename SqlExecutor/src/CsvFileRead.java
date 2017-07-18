@@ -46,7 +46,14 @@ public class CsvFileRead {
 			if (parsedQuery.getCols().get(0).equals("*"))
 				return getDataFromCsv(parsedQuery);
 			else if (parsedQuery.isHasAggregate()) {
-				return processor.aggregateQuery(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
+				Map<Integer,String> rowdata=new HashMap<>();
+				Map<Integer,Aggregate> r=processor.aggregateQuery(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
+				int i=0;
+				for(Aggregate a:r.values()){
+					rowdata.put(i,a.toString());
+					i++;
+				}
+				return rowdata;
 			} else {
 				return processor.specifiedQueryProcessor(parsedQuery, storeHeaderOfCsv(parsedQuery.getPath()));
 			}

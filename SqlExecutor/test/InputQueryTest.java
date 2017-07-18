@@ -13,6 +13,7 @@ public class InputQueryTest {
 	public void objectCreate() {
 		csv = new CsvFileRead();
 	}
+
 /*	@Test
 	public void selectAllWithoutWhereTestCase() {
 
@@ -165,12 +166,12 @@ public class InputQueryTest {
 	}
 */
 	@Test
-	public void selectColumnsWithoutWhereWithGroupBySumTestCase(){
-		
-		Map<Integer, String> dataSet=csv.executeQuery("select dept,sum(salary) from CsvDB.csv groupby dept");
+	public void selectColumnsWithoutWhereWithGroupBySumTestCase() {
+
+		Map<Integer, String> dataSet = csv.executeQuery("select sum(salary) from CsvDB.csv where city=Bangalore");
 		assertNotNull(dataSet);
-		display("selectColumnsWithoutWhereWithOrderByTestCase",dataSet);
-		
+		display("selectColumnsWithoutWhereWithOrderByTestCase", dataSet);
+
 	}
 
 	private void display(String testCaseName, Map<Integer, String> dataSet) {

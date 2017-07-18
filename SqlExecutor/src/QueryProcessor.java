@@ -512,13 +512,20 @@ public class QueryProcessor {
 		return rowdata;
 	}
 
-	public Map<Integer, String> aggregateQuery(QueryParser parser, Map<String, Integer> header) {
-		Map<Integer, String> rowdata = new HashMap<>();
-		String col = parser.getCols().get(0);
+	public Map<Integer, Aggregate> aggregateQuery(QueryParser parser, Map<String, Integer> header) {
+		Map<Integer, Aggregate> rowdata = new HashMap<>();
+		Aggregate agg;
+		String col ;
+		int index=0;
 		BufferedReader reader = null;
 		String aggr = "";
+		int len=parser.getCols().size();
+		for(int i=0;i<len;i++)
+		{
+			col=parser.getCols().get(i);
 		if (col.contains("sum")) {
-
+			agg=new Aggregate();
+     
 			aggr = col.split("sum")[1];
 			aggr = aggr.replaceAll("\\p{P}", "");
 			try {
@@ -534,15 +541,17 @@ public class QueryProcessor {
 				int sum = 0;
 				for (String st : col_of_Aggr)
 					sum += Integer.parseInt(st);
-
-				rowdata.put(0, Integer.toString(sum));
+				agg.setAggreFunc("sum");
+				agg.setColumn(aggr);
+				agg.setResult(sum);
+				rowdata.put(++index, agg);
 			} catch (IOException e) {
 			}
-			return rowdata;
+			
 		}
 
 		else if (col.contains("count")) {
-
+            agg=new Aggregate();
 			aggr = col.split("count")[1];
 			aggr = aggr.replaceAll("\\p{P}", "");
 			try {
@@ -555,13 +564,17 @@ public class QueryProcessor {
 					col_of_Aggr.add(afterSplit[header.get(aggr)]);
 					str = reader.readLine();
 				}
-				String len = Integer.toString(col_of_Aggr.size());
-				rowdata.put(0, len);
+				int cou =col_of_Aggr.size();
+				agg.setAggreFunc("count");
+				agg.setColumn(aggr);
+				agg.setResult(cou);
+				rowdata.put(++index,agg);
 			} catch (IOException e) {
 			}
 
-			return rowdata;
+			
 		} else if (col.contains("avg")) {
+			agg=new Aggregate();
 			aggr = col.split("avg")[1];
 			aggr = aggr.replaceAll("\\p{P}", "");
 			try {
@@ -579,13 +592,16 @@ public class QueryProcessor {
 					sum += Integer.parseInt(st);
 
 				int avg = sum / col_of_Aggr.size();
-
-				rowdata.put(0, Integer.toString(avg));
+				agg.setAggreFunc("avg");
+				agg.setColumn(aggr);
+				agg.setResult(avg);
+				rowdata.put(++index, agg);
 			} catch (IOException e) {
 			}
 
-			return rowdata;
+			
 		} else if (col.contains("min")) {
+			agg=new Aggregate();
 			aggr = col.split("min")[1];
 			aggr = aggr.replaceAll("\\p{P}", "");
 			try {
@@ -602,13 +618,16 @@ public class QueryProcessor {
 				for (String strg : col_of_Aggr)
 					list.add(Integer.parseInt(strg));
 				int min = Collections.min(list);
-
-				rowdata.put(0, Integer.toString(min));
+				agg.setAggreFunc("min");
+				agg.setColumn(aggr);
+				agg.setResult(min);
+				rowdata.put(++index, agg);
 			} catch (IOException e) {
 			}
 
-			return rowdata;
+			
 		} else if (col.contains("max")) {
+			agg=new Aggregate();
 			aggr = col.split("max")[1];
 			aggr = aggr.replaceAll("\\p{P}", "");
 			try {
@@ -625,16 +644,18 @@ public class QueryProcessor {
 				for (String strg : col_of_Aggr)
 					list.add(Integer.parseInt(strg));
 				int max = Collections.max(list);
-
-				rowdata.put(0, Integer.toString(max));
+                agg.setAggreFunc("max");
+                agg.setColumn(aggr);
+                agg.setResult(max);
+				rowdata.put(++index,agg);
 
 			} catch (IOException e) {
 			}
 
-			return rowdata;
+			
 		}
-
-		return null;
+	}
+		return rowdata;
 
 	}
 
@@ -671,91 +692,175 @@ public class QueryProcessor {
 		return null;
 	}
 
-	public Map<Integer,String> groupByQueryProcessor(QueryParser parser, Map<String, Integer> header) {
+	public Map<Integer, String> groupByQueryProcessor(QueryParser parser, Map<String, Integer> header) {
 		Set<String> uniqueValue = new LinkedHashSet<>();
-		List<String> csvData=new ArrayList<>();
-		Map<Integer,String> rowdata=new HashMap<>();
-		Map<Integer,String> resSet=new HashMap<>();
+		List<String> csvData = new ArrayList<>();
+		Map<Integer, String> rowdata = new HashMap<>();
+		Map<Integer, String> resSet = new HashMap<>();
+		List<Map<Integer, String>> listOfMap = new ArrayList<>();
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(parser.getPath()));
 			String str = reader.readLine();
 			str = reader.readLine();
+			String afterSplit[];
 			while (str != null) {
-				String afterSplit[] = str.split(",");
+				afterSplit = str.split(",");
 				uniqueValue.add(afterSplit[header.get(parser.getGrp_clause())]);
 				csvData.add(str);
 				str = reader.readLine();
 			}
-			boolean res=false;
-			for(int i=0;i<parser.getCols().size();i++){
-				res=parser.getCols().get(i).contains("count");
-			}
-			if(res){
-			int index=0;
-			for(String uniq:uniqueValue){
-				StringBuffer sb=new StringBuffer();
-				for(String csv:csvData){
-					if(csv.contains(uniq)){
-					sb.append(csv+",");
+
+			boolean res = false;
+			for (int i = 0; i < parser.getCols().size(); i++) {
+
+				if (parser.getCols().get(i).contains("count")) {
+					res = true;
+					int index = 0;
+					StringBuffer sb;
+					for (String uniq : uniqueValue) {
+						sb = new StringBuffer();
+						for (String csv : csvData) {
+							if (csv.contains(uniq)) {
+								sb.append(csv + ",");
+							}
+
+						}
+						rowdata.put(index, sb.toString());
+						index++;
 					}
-					
+					int count = 0;
+					index = 0;
+					String splitVal[];
+					for (String ite : rowdata.values()) {
+					splitVal = ite.split(",");
+						count = splitVal.length;
+
+						resSet.put(index, Integer.toString(count / header.size()));
+						index++;
+					}
+				} else if (parser.getCols().get(i).contains("sum")) {
+					res = true;
+					String aggr = " ";
+
+					aggr = parser.getCols().get(i).split("sum")[1];
+					aggr = aggr.replaceAll("\\p{P}", "");
+
+					int headerposi = header.get(aggr);
+					int salsum = 0, index = 0;
+					String split[];
+					for (String uni : uniqueValue) {
+						for (String csv : csvData) {
+							 split= csv.split(",");
+							if (csv.contains(uni)) {
+								salsum += Integer.parseInt(split[headerposi]);
+							}
+						}
+						resSet.put(index, Integer.toString(salsum));
+						index++;
+						salsum = 0;
+					}
+				} else if (parser.getCols().get(i).contains("avg")) {
+					res = true;
+					String aggr = " ";
+
+					aggr = parser.getCols().get(i).split("avg")[1];
+					aggr = aggr.replaceAll("\\p{P}", "");
+
+					int headerposi = header.get(aggr);
+					int salsum = 0, index = 0, c = 0;
+					String split[];
+					for (String uni : uniqueValue) {
+						for (String csv : csvData) {
+							split = csv.split(",");
+							if (csv.contains(uni)) {
+								++c;
+								salsum += Integer.parseInt(split[headerposi]);
+							}
+
+						}
+						resSet.put(index, Integer.toString(salsum / c));
+						index++;
+						salsum = 0;
+						c = 0;
+					}
+				} else if (parser.getCols().get(i).contains("min")) {
+					res = true;
+					List<Integer> list = new ArrayList<>();
+					String aggr = " ";
+					aggr = parser.getCols().get(i).split("min")[1];
+					aggr = aggr.replaceAll("\\p{P}", "");
+
+					int headerposi = header.get(aggr);
+					int index = 0;
+					String split[];
+					for (String uni : uniqueValue) {
+						for (String csv : csvData) {
+							split = csv.split(",");
+							if (csv.contains(uni)) {
+								list.add(Integer.parseInt(split[headerposi]));
+							}
+
+						}
+						resSet.put(index, Integer.toString(Collections.min(list)));
+						index++;
+						list.clear();
+
+					}
+				} else if (parser.getCols().get(i).contains("max")) {
+					res = true;
+					List<Integer> list = new ArrayList<>();
+					String aggr = " ";
+
+					aggr = parser.getCols().get(i).split("max")[1];
+					aggr = aggr.replaceAll("\\p{P}", "");
+
+					int headerposi = header.get(aggr);
+					int index = 0;
+					String split[];
+					for (String uni : uniqueValue) {
+						for (String csv : csvData) {
+							split = csv.split(",");
+							if (csv.contains(uni)) {
+								list.add(Integer.parseInt(split[headerposi]));
+							}
+
+						}
+						resSet.put(index, Integer.toString(Collections.max(list)));
+						index++;
+						list.clear();
+
+					}
 				}
+				
+				if(res){
+				listOfMap.add(resSet);
+				res=false;
+				}
+			}
+
+			int index = 0;
+			Iterator<String> iter = uniqueValue.iterator();
+			int l = uniqueValue.size();
+			StringBuilder sb = new StringBuilder();
+
+			for (int data = 0; data < l; data++) {
+				for (int i = 0; i < listOfMap.size(); i++) {
+					sb.append(listOfMap.get(i).get(data) + ",");
+
+				}
+				sb.append(iter.next());
 				rowdata.put(index, sb.toString());
+				sb.setLength(0);
 				index++;
 			}
-			int count=0;
-			index=0;
-			
-			for(String ite:rowdata.values()){
-				String splitVal[]=ite.split(",");
-				count=splitVal.length;
-				
-			resSet.put(index, Integer.toString(count/header.size()));
-			index++;
-			}
-			}
-			else {
-				String aggr=" ";
-				res=false;
-				int i=0;
-				for( i=0;i<parser.getCols().size();i++){
-					if(parser.getCols().get(i).contains("sum")){
-						aggr = parser.getCols().get(i).split("sum")[1];
-						aggr = aggr.replaceAll("\\p{P}", "");
-					}
-				}
-				int headerposi=header.get(aggr);
-				int salsum=0,index=0;
-				for(String uni:uniqueValue){
-				for(String csv:csvData){					
-					String split[]=csv.split(",");
-					if(csv.contains(uni)){
-					salsum+=Integer.parseInt(split[headerposi]);}
-					}
-					resSet.put(index, Integer.toString(salsum));
-					index++;
-					salsum=0;
-				}
-				}
-			Iterator<String>iter=uniqueValue.iterator();
-			int l=uniqueValue.size();
-			StringBuilder sb=new StringBuilder();
-			for(int data=0;data<l;data++){
-				sb.append(iter.next()+" "+resSet.get(data));
-				rowdata.put(data, sb.toString());
-				sb.setLength(0);
-			}
-		
-			
 
 		}
-				
+
 		catch (IOException io) {
 		}
-		
-		
+
 		return rowdata;
-		
+
 	}
 }
